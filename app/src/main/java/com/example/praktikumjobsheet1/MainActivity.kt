@@ -1,25 +1,38 @@
 package com.example.praktikumjobsheet1
 
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import androidx.activity.ComponentActivity
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var navController: NavController
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.hello_world)
+        setContentView(R.layout.activity_main)
 
-        val nameEditText: EditText = findViewById(R.id.nameEditText)
-        val buttonButton: Button = findViewById(R.id.buttonButton)
-        val buttonTextView: TextView = findViewById(R.id.buttonTextView)
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.navHostFragment) as NavHostFragment
+        val navController = navHostFragment.navController
+        findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+            .setupWithNavController(navController)
 
-        buttonTextView.text = "Hai"
+        val appBarConfiguration = AppBarConfiguration(
+            setOf(
+                R.id.recipesFragment,
+                R.id.favoriteRecipesFragment,
+                R.id.userProfileFragment,
 
-        buttonButton.setOnClickListener {
-            val name = nameEditText.text.toString()
-            buttonTextView.text = "Hai $name ganteng"
-        }
+                )
+        )
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp() || super.onSupportNavigateUp()
     }
 }
