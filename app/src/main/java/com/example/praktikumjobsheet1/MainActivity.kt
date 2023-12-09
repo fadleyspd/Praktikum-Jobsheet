@@ -1,25 +1,41 @@
 package com.example.praktikumjobsheet1
 
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import androidx.activity.ComponentActivity
+import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.praktikumjobsheet1.api.ApiConfig
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.hello_world)
+        setContentView(R.layout.activity_main)
+        val morty = findViewById<RecyclerView>(R.id.rv_mortin)
 
-        val nameEditText: EditText = findViewById(R.id.nameEditText)
-        val buttonButton: Button = findViewById(R.id.buttonButton)
-        val buttonTextView: TextView = findViewById(R.id.buttonTextView)
+        ApiConfig.getService().getMorty().enqueue(object : Callback<ResponseMorty> {
+            override fun onResponse(call: Call<ResponseMorty>, response: Response<ResponseMorty>) {
+                if (response.isSuccessful){
+                    val responseMorty = response.body()
+                    val dataMorty = responseMorty?.results
+                    val mortyAdapter = MortyAdapter(dataMorty)
+                    morty.apply {
+                        layoutManager = LinearLayoutManager(this@MainActivity)
+                        setHasFixedSize(true)
+                        mortyAdapter.notifyDataSetChanged()
+                        adapter = mortyAdapter
+                    }
+                }
 
-        buttonTextView.text = "Hai"
+            }
 
-        buttonButton.setOnClickListener {
-            val name = nameEditText.text.toString()
-            buttonTextView.text = "Hai $name ganteng"
-        }
+            override fun onFailure(call: Call<ResponseMorty>, t: Throwable) {
+                Toast.makeText(applicationContext, t.localizedMessage, Toast.LENGTH_SHORT).show()
+            }
+
+        })
     }
 }
